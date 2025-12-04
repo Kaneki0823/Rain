@@ -6,28 +6,33 @@ const enterBtn = document.getElementById("enterBtn");
 const landing = document.getElementById("landing");
 const main = document.getElementById("main");
 const music = document.getElementById("bgMusic");
+const centerMessage = document.getElementById("centerMessage");
+const lyricsBox = document.getElementById("lyrics");
+
+let startTime = null;
 
 enterBtn.addEventListener("click", () => {
-
-    // Start music immediately (user gesture)
-    music.play().catch(() => {
-        setTimeout(() => music.play(), 1500);
-    });
-
     landing.classList.add("fade-out");
 
     setTimeout(() => {
         landing.style.display = "none";
         main.classList.remove("hidden");
+
+        // Start the timer for both messages and subtitles
+        startTime = performance.now();
+        requestAnimationFrame(update);
+
+        // Play music (user gesture)
+        music.play().catch(() => {
+            setTimeout(() => music.play(), 1500);
+        });
+
     }, 2000);
 });
 
-
-/* ====================================================== */
-/* MESSAGE (ONE-TIME ONLY — DOES NOT REPEAT WITH THE SONG) */
-/* ====================================================== */
-
-let messageHasEnded = false; // <<< prevents looping
+/* ========================= */
+/* MESSAGE LINES (Timer-based) */
+/* ========================= */
 
 const messageLines = [
     { time: 2, text: "This song..." },
@@ -127,39 +132,10 @@ const messageLines = [
     { time: 385, text: "Kei." }
 ];
 
-const lastMessageTime = messageLines[messageLines.length - 1].time;
-
-const centerMessage = document.getElementById("centerMessage");
-
-music.addEventListener("timeupdate", () => {
-
-    // Stop updating messages after end
-    if (messageHasEnded) return;
-
-    const now = Math.floor(music.currentTime);
-
-    // Mark message as ended
-    if (now > lastMessageTime) {
-        messageHasEnded = true;
-        return;
-    }
-
-    // Show lines normally until then
-    messageLines.forEach(line => {
-        if (now === line.time) {
-            centerMessage.style.opacity = 0;
-
-            setTimeout(() => {
-                centerMessage.textContent = line.text;
-                centerMessage.style.opacity = 1;
-            }, 300);
-        }
-    });
-});
-
+let lastMessageIndex = -1;
 
 /* ========================= */
-/* LYRICS SUBTITLES (looping) */
+/* LYRICS (Timer-based) */
 /* ========================= */
 
 const subtitles = [
@@ -209,19 +185,43 @@ const subtitles = [
     { time: 207, text: "I'll crawl home to her" }
 ];
 
-const lyricsBox = document.getElementById("lyrics");
+let lastSubtitleIndex = -1;
 
-music.addEventListener("timeupdate", () => {
-    const now = Math.floor(music.currentTime);
+/* ========================= */
+/* ANIMATION FRAME LOOP */
+/* ========================= */
 
-    subtitles.forEach(sub => {
-        if (now === sub.time) {
+function update() {
+    const elapsed = (performance.now() - startTime) / 1000;
+
+    // Messages
+    for (let i = 0; i < messageLines.length; i++) {
+        const line = messageLines[i];
+        if (elapsed >= line.time && lastMessageIndex < i) {
+            lastMessageIndex = i;
+            centerMessage.style.opacity = 0;
+            setTimeout(() => {
+                centerMessage.textContent = line.text;
+                centerMessage.style.opacity = 1;
+            }, 300);
+        }
+    }
+
+    // Subtitles
+    for (let i = 0; i < subtitles.length; i++) {
+        const sub = subtitles[i];
+        if (elapsed >= sub.time && lastSubtitleIndex < i) {
+            lastSubtitleIndex = i;
             lyricsBox.style.opacity = 0;
-
             setTimeout(() => {
                 lyricsBox.textContent = sub.text;
                 lyricsBox.style.opacity = 1;
             }, 300);
         }
-    });
-});
+    }
+
+    // Continue until all messages are shown
+    if (lastMessageIndex < messageLines.length - 1 || lastSubtitleIndex < subtitles.length - 1) {
+        requestAnimationFrame(update);
+    }
+}
