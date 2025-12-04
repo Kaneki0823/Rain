@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dedicated to Rain</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========================= -->
+    <!-- LANDING PAGE -->
+    <!-- ========================= -->
+    <div id="landing">
+        <div class="landing-content">
+            <button id="enterBtn">Enter</button>
+        </div>
+        <div class="particles"></div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- MAIN CONTENT WRAPPER -->
+    <!-- ========================= -->
+    <div id="main" class="hidden">
+
+        <!-- ========================= -->
+        <!-- CENTER MESSAGE + MUSIC -->
+        <!-- ========================= -->
+        <section id="hero">
+
+            <!-- Autoplay music (no button needed) -->
+            <audio id="bgMusic" src="song.mp3" loop></audio>
+
+            <!-- CENTER FADING MESSAGE -->
+            <div id="centerMessage"></div>
+
+            <!-- LYRICS SUBTITLE AREA -->
+            <div id="lyrics"></div>
+        </section>
+
+        <!-- SCROLL SECTIONS -->
+        <section class="scroll-section">
+            <h2>Rain.</h2>
+            <p>I don't just love you in the good moments.<br>I love you in every quiet, messy, imperfect moments too.</p>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
